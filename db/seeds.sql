@@ -5,7 +5,7 @@ VALUES (5, 'space'),
        (2, 'night'), 
        (7, 'chaos');
 
-INSERT INTO position (id, title, salary, department_id)
+INSERT INTO role (id, title, salary, department_id)
 VALUES (77, 'harbringer', 100000, 7),
        (66, 'omen', 85000, 7),
        (12, 'clock', 90000, 3),
@@ -15,14 +15,14 @@ VALUES (77, 'harbringer', 100000, 7),
        (16, 'matter', 70000, 5),
        (18, 'dark matter', 63000, 5);
 
-INSERT INTO employee (id, first_name, last_name, position_id, manager_id)
-VALUES (333, 'Iris',	'Cosmos', 77),
+INSERT INTO employee (id, first_name, last_name, role_id, manager_id)
+VALUES (333, 'Iris',	'Cosmos', 77, NULL),
        (112, 'Bartok', 'Chev', 66, 333),
        (223, 'Felix', 'Raine', 66, 333),
-       (444, 'Chloe', 'Weiss', 12),
+       (444, 'Chloe', 'Weiss', 12, NULL),
        (355, 'Guy', 'Light', 33, 444),
        (554, 'Art', 'Simet', 32, 444),
-       (777, 'Shelly', 'Tran', 22),
+       (777, 'Shelly', 'Tran', 22, NULL),
        (668, 'Otto', 'Stuff', 16, 777),
        (996, 'Brock', 'Olle', 18, 777),
        (228, 'River', 'Still', 18, 777),
