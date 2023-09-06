@@ -130,15 +130,14 @@ function addDepartment() {
 }
 
 function addRole() {
-  db.query("SELECT name, id, FROM department", function (err, results) {
+  db.query("SELECT name, id FROM department", function (err, results) {
     if (err) {
       console.log(err);
       return;
     }
-    const depChoices = results.map((department) => ({
-      name: department.name,
-      value: department.id,
-    }));
+    const depChoices = results.map((department) => {
+      return department.name;
+    });
     inquirer
       .prompt([
         {
@@ -152,16 +151,21 @@ function addRole() {
           message: "What is the role's salary?",
         },
         {
-          name: "departmentId",
+          name: "department",
           type: "list",
           message: "What is the new role's department?",
           choices: depChoices,
         },
       ])
       .then((response) => {
+        for (let i = 0; i < results.length; i++) {
+          if ((results[i].name = response.department)) {
+            const departmentId = results[i].id;
+          }
+        }
         db.query(
           "INSERT INTO role(title, salary, department_id) VALUES (?, ?, ?)",
-          [response.title, response.salary, response.departmentId]
+          [response.title, response.salary, departmentId]
         );
         begin();
       });
@@ -201,7 +205,7 @@ function addEmployee() {
           response.employeeFirstName,
           response.employeeLastName,
           response.employeeRole,
-          response.employeeManager
+          response.employeeManager,
         ]
       );
       begin();
