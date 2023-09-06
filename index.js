@@ -1,5 +1,4 @@
 //Require external packages
-// const express = require("express");
 const inquirer = require("inquirer");
 const mysql = require("mysql2");
 
@@ -12,17 +11,6 @@ require("dotenv").config();
 //add employees, roles, departments
 //update or delete existing data
 
-//initialize instance of express
-// const app = express();
-
-//port handler
-//do i need this?
-//const PORT = process.env.PORT || 3001;
-
-//express middleware (urlencoded/url parser, json parser)
-// app.use(express.urlencoded({ extended: false }));
-// app.use(express.json());
-
 //connect to database
 const db = mysql.createConnection(
   {
@@ -33,7 +21,6 @@ const db = mysql.createConnection(
   },
   console.log(`Connected to the employees_db database.`)
 );
-//do i need this in my utils/view.js file?
 
 function begin() {
   inquirer
