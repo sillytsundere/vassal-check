@@ -5,12 +5,6 @@ const mysql = require("mysql2");
 //Require .env file for db createConnection
 require("dotenv").config();
 
-//Require internal modules
-//potential modularization
-//View queries
-//add employees, roles, departments
-//update or delete existing data
-
 //connect to database
 const db = mysql.createConnection(
   {
@@ -60,9 +54,11 @@ function begin() {
           addDepartment();
           break;
         case "Add Role":
+          addRole();
           console.log("User requested to Add a Role");
           break;
         case "Add Employee":
+          addEmployee();
           console.log("User requested to Add an Employee");
           break;
         case "Update Employee Role":
@@ -79,7 +75,7 @@ function begin() {
       process.exit();
     });
 }
-////Potential functionality to add to project
+////Potential functionality to add
 // Update employee managers.
 // View employees by manager.
 // View employees by department.
@@ -133,6 +129,85 @@ function addDepartment() {
     });
 }
 
+function addRole() {
+  db.query("SELECT name, id, FROM department", function (err, results) {
+    if (err) {
+      console.log(err);
+      return;
+    }
+    const depChoices = results.map((department) => ({
+      name: department.name,
+      value: department.id,
+    }));
+    inquirer
+      .prompt([
+        {
+          name: "title",
+          type: "input",
+          message: "What is the name of the new Role?",
+        },
+        {
+          name: "salary",
+          type: "input",
+          message: "What is the role's salary?",
+        },
+        {
+          name: "departmentId",
+          type: "list",
+          message: "What is the new role's department?",
+          choices: depChoices,
+        },
+      ])
+      .then((response) => {
+        db.query(
+          "INSERT INTO role(title, salary, department_id) VALUES (?, ?, ?)",
+          [response.title, response.salary, response.departmentId]
+        );
+        begin();
+      });
+  });
+}
+
+function addEmployee() {
+  inquirer
+    .prompt([
+      {
+        name: "employeeFirstName",
+        type: "input",
+        message: "What is the first name of the new Employee?",
+      },
+      {
+        name: "employeeLastName",
+        type: "input",
+        message: "What is the last name of the new employee?",
+      },
+      {
+        name: "employeeRole",
+        type: "input",
+        message: "What is the role of the new employee?",
+      },
+      {
+        name: "employeeManager",
+        type: "input",
+        message:
+          "If this new employee has a manager please enter it here or type 'NULL' if they do not have a manager.",
+      },
+    ])
+    //i need to change role and manager names into id's
+    .then((response) => {
+      db.query(
+        "INSERT INTO employee(first_name, last_name, role_id, manager_id) VALUES (?, ?, ?, ?)",
+        [
+          response.employeeFirstName,
+          response.employeeLastName,
+          response.employeeRole,
+          response.employeeManager
+        ]
+      );
+      begin();
+    });
+}
+
 function updateEmployeeRole() {
   inquirer
     .prompt([
@@ -149,6 +224,7 @@ function updateEmployeeRole() {
       },
     ])
     .then((response) => {
+      //UPDATE employee SET role_id(INT) WHERE theemployeeidtobechanged
       db.query("UPDATE employee SET ? WHERE ?;", [
         {
           title: response.newRole,
