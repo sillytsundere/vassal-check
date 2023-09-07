@@ -107,9 +107,9 @@ function viewRoles() {
 
 function viewEmployees() {
   db.query(
-    `SELECT employee.id, employee.first_name, employee.last_name, role.title, role.salary, department.name AS department, e2.first_name AS manager 
+    `SELECT employee.id, employee.first_name, employee.last_name, role.title, role.salary, department.name AS department, m.first_name AS manager 
     FROM employee 
-    LEFT JOIN employee as e2 ON e2.id = employee.manager_id 
+    LEFT JOIN employee as m ON m.id = employee.manager_id 
     JOIN role ON employee.role_id = role.id 
     JOIN department ON role.department_id = department.id 
     ORDER BY employee.id`,
@@ -134,7 +134,6 @@ function addDepartment() {
       },
     ])
     .then((response) => {
-
       db.query("INSERT INTO department SET ?", {
         name: response.departmentName,
       });
@@ -245,8 +244,7 @@ function addEmployee() {
                   {
                     name: "manager_name",
                     type: "list",
-                    message:
-                      "Who is the new employee's manager?",
+                    message: "Who is the new employee's manager?",
                     choices: function () {
                       let choiceArray = [];
                       for (let i = 0; i < results.length; i++) {
