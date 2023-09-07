@@ -17,6 +17,7 @@ const db = mysql.createConnection(
 );
 
 function begin() {
+  //use inquirer package to ask user what tasks to perform
   inquirer
     .prompt([
       {
@@ -35,6 +36,7 @@ function begin() {
         ],
       },
     ])
+    //the tasks chosen by user will initiate functions to perform the actions
     .then((response) => {
       switch (response.task) {
         case "View All Departments":
@@ -68,7 +70,7 @@ function begin() {
       process.exit();
     });
 }
-////Potential functionality to add
+////Potential functionality to add:
 // Update employee managers.
 // View employees by manager.
 // View employees by department.
@@ -76,16 +78,18 @@ function begin() {
 // View the total utilized budget of a department—in other words, the combined salaries of all employees in that department.
 
 function viewDepartments() {
+  //this function will display all the departments in a table with id and name columns
   db.query(`SELECT * FROM department`, function (err, results) {
     if (err) {
       console.log(err);
     }
-    console.table(results); //console.table also writes index column
+    console.table(results);
     begin();
   });
 }
 
 function viewRoles() {
+  //this function will display all roles in the role table with columns for id, title, salary, and the department id with the department name listed instead of the department id for easier readability for user
   db.query(
     `SELECT role.id, title, salary, department.name AS department 
     FROM role JOIN department 
@@ -113,6 +117,7 @@ function viewEmployees() {
       if (err) {
         console.log(err);
       }
+      //display the current employees table with columns for id, first name, last name, role title, salary and department name
       console.table(results);
       begin();
     }
@@ -129,14 +134,17 @@ function addDepartment() {
       },
     ])
     .then((response) => {
+
       db.query("INSERT INTO department SET ?", {
         name: response.departmentName,
       });
+      console.log("Department sucessfully added.");
       begin();
     });
 }
 
 function addRole() {
+  //select department names to list for department query choices
   db.query("SELECT name, id FROM department", function (err, results) {
     if (err) {
       console.log(err);
@@ -168,6 +176,7 @@ function addRole() {
         },
       ])
       .then((response) => {
+        //convert department name to department id to add to table in insert query
         let departmentId;
         for (let i = 0; i < results.length; i++) {
           if (results[i].name === response.department) {
@@ -178,6 +187,7 @@ function addRole() {
           "INSERT INTO role(title, salary, department_id) VALUES (?, ?, ?)",
           [response.title, response.salary, departmentId]
         );
+        console.log("Role sucessfully added.");
         begin();
       });
   });
@@ -185,6 +195,7 @@ function addRole() {
 
 function addEmployee() {
   let newEmployee = {};
+  //selects role table to list the titles for role title query choices
   db.query("SELECT * FROM role", function (err, results) {
     if (err) throw err;
 
@@ -218,13 +229,14 @@ function addEmployee() {
         newEmployee.last_name = answer.last_name;
 
         db.query(
+          //selects role table here where the title equals the selected title to convert the role title to the role id to enter into the insert query below
           "SELECT * FROM role WHERE title = ?",
           answer.role,
           function (err, results) {
             if (err) throw err;
 
             newEmployee.role_id = results[0].id;
-
+            //employee table selected here to display employee names as list of choices for new employee manager
             db.query("SELECT * FROM employee", function (err, results) {
               if (err) throw err;
 
@@ -234,7 +246,7 @@ function addEmployee() {
                     name: "manager_name",
                     type: "list",
                     message:
-                      "Who is the employee's manager? If no manager, please select 'NULL.'",
+                      "Who is the new employee's manager?",
                     choices: function () {
                       let choiceArray = [];
                       for (let i = 0; i < results.length; i++) {
@@ -246,6 +258,7 @@ function addEmployee() {
                 ])
                 .then(function (response) {
                   db.query(
+                    //here the employee table is selected where the first name equals the employee id to enter the id into the insert query
                     "SELECT id FROM employee WHERE first_name = ?",
                     response.manager_name,
                     function (err, results) {
