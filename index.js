@@ -158,9 +158,10 @@ function addRole() {
         },
       ])
       .then((response) => {
+        let departmentId;
         for (let i = 0; i < results.length; i++) {
-          if ((results[i].name = response.department)) {
-            const departmentId = results[i].id;
+          if (results[i].name === response.department) {
+            departmentId = results[i].id;
           }
         }
         db.query(
@@ -173,46 +174,90 @@ function addRole() {
 }
 
 function addEmployee() {
-  inquirer
-    .prompt([
-      {
-        name: "employeeFirstName",
-        type: "input",
-        message: "What is the first name of the new Employee?",
-      },
-      {
-        name: "employeeLastName",
-        type: "input",
-        message: "What is the last name of the new employee?",
-      },
-      {
-        name: "employeeRole",
-        type: "input",
-        message: "What is the role of the new employee?",
-      },
-      {
-        name: "employeeManager",
-        type: "input",
-        message:
-          "If this new employee has a manager please enter it here or type 'NULL' if they do not have a manager.",
-      },
-    ])
-    //i need to change role and manager names into id's
-    .then((response) => {
-      db.query(
-        "INSERT INTO employee(first_name, last_name, role_id, manager_id) VALUES (?, ?, ?, ?)",
-        [
-          response.employeeFirstName,
-          response.employeeLastName,
-          response.employeeRole,
-          response.employeeManager,
-        ]
-      );
-      begin();
-    });
+  db.query(
+    "SELECT employee.role_id, title, employee.id, manager_id, first_name, last_name FROM role INNER JOIN employee ON employee.role_id = role.id",
+    function (err, results) {
+      if (err) {
+        console.log(err);
+        return;
+      }
+      const roleChoices = results.map((role) => {
+        return role.title;
+      });
+      let managerChoices = results.map((role) => {
+        return role.first_name + " " + role.last_name;
+      });
+      managerChoices.push("NULL");
+      inquirer
+        .prompt([
+          {
+            name: "employeeFirstName",
+            type: "input",
+            message: "What is the first name of the new Employee?",
+          },
+          {
+            name: "employeeLastName",
+            type: "input",
+            message: "What is the last name of the new employee?",
+          },
+          {
+            name: "employeeRole",
+            type: "list",
+            message: "What is the role of the new employee?",
+            choices: roleChoices,
+          },
+          {
+            name: "employeeManager",
+            type: "list",
+            message:
+              "If this new employee has a manager please enter it here or type 'NULL' if they do not have a manager.",
+            choices: managerChoices,
+          },
+        ])
+        //i need to change role and manager names into id's
+        .then((response) => {
+          console.table(results);
+          let roleId;
+        for (let i = 0; i < results.length; i++) {
+          if (results[i].title === response.employeeRole) {
+            roleId = results[i].role_id;
+          }
+        }
+        let managerId;
+        for (let i = 0; i < results.length; i++) {
+          let fullName = results.first_name + " " + results.last_name;
+          if (fullName === response.employeeManager) {
+            managerId = results[i].id;
+          }
+        }
+        console.log(roleId);
+          db.query(
+            "INSERT INTO employee(first_name, last_name, role_id, manager_id) VALUES (?, ?, ?, ?)",
+            [
+              response.employeeFirstName,
+              response.employeeLastName,
+              roleId,
+              managerId,
+            ]
+          );
+          begin();
+        });
+    }
+  );
 }
 
 function updateEmployeeRole() {
+  console.log(
+    db.query(
+      "SELECT id, first_name, last_name FROM employee",
+      function (err, results) {
+        if (err) {
+          console.log(err);
+        }
+        console.table(results);
+      }
+    )
+  );
   inquirer
     .prompt([
       {
