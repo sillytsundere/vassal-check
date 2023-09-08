@@ -30,7 +30,7 @@ Once installed and running the application allows users to:
 
 - Update an employee's role
 
-A video demonstrating the utility of the application can be viewed at this link: https://drive.google.com/file/d/1DJu3FrDXLr5LstZ_l2mRXC-wupm_GExs/view?usp=sharing
+A video demonstrating the utility of the application can be viewed at this link: https://drive.google.com/file/d/12CTSopqEA1e0HTkozSLah795JKOnkpc3/view?usp=sharing
 
 ## License
 
