@@ -109,7 +109,7 @@ function viewEmployees() {
   db.query(
     `SELECT employee.id, employee.first_name, employee.last_name, role.title, role.salary, department.name AS department, m.first_name AS manager 
     FROM employee 
-    LEFT JOIN employee as m ON m.id = employee.manager_id 
+    LEFT JOIN employee as m ON employee.manager_id = m.id 
     JOIN role ON employee.role_id = role.id 
     JOIN department ON role.department_id = department.id 
     ORDER BY employee.id`,
